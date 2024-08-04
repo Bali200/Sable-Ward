@@ -1,7 +1,6 @@
 // Import the required modules
 const { Client, GatewayIntentBits } = require('discord.js');
 const express = require('express');
-const keepAlive = require('keep-alive');
 const dotenv = require('dotenv');
 
 // Load environment variables from .env file
@@ -29,9 +28,18 @@ client.login(process.env.DISCORD_BOT_TOKEN);
 // Create an Express application
 const app = express();
 
-// Define a simple route
+// Define a simple route for the home page
 app.get('/', (req, res) => {
   res.send('Bot is running!');
+});
+
+// Define a health check route
+app.get('/health', (req, res) => {
+  if (client.isReady()) {
+    res.status(200).send('Bot is healthy and running!');
+  } else {
+    res.status(503).send('Bot is not running.');
+  }
 });
 
 // Start the server and listen on a port
@@ -39,6 +47,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-// Keep the bot alive (this part is hypothetical since 'keep-alive' is not a common package)
-keepAlive.start();
