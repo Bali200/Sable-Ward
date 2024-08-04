@@ -6,8 +6,14 @@ const dotenv = require('dotenv');
 // Load environment variables from .env file
 dotenv.config();
 
-// Create a new Discord client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+// Create a new Discord client with only necessary intents
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,          // Enables working with guild data
+    GatewayIntentBits.GuildMessages,   // Enables working with guild messages
+    GatewayIntentBits.MessageContent   // Enables access to message content (requires intent to be enabled in the Discord Developer Portal)
+  ]
+});
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
