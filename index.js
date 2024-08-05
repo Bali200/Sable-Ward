@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Create a new Discord client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] });
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
@@ -45,6 +45,24 @@ client.once('ready', () => {
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
 });
+
+// Listen for guildMemberAdd event and assign a role
+client.on('guildMemberAdd', async member => {
+  const roleId = '1269680128871501996'; // ID of the role to assign
+  const role = member.guild.roles.cache.get(roleId);
+
+  if (role) {
+    try {
+      await member.roles.add(role);
+      console.log(`Assigned role ${role.name} to ${member.user.tag}`);
+    } catch (error) {
+      console.error(`Failed to assign role: ${error}`);
+    }
+  } else {
+    console.error(`Role with ID ${roleId} not found.`);
+  }
+});
+
 
 // Listen for slash commands and respond
 client.on('interactionCreate', async interaction => {
