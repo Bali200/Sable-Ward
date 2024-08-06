@@ -109,7 +109,6 @@ client.on('messageCreate', async message => {
         content: `${suggestionAuthor}:`,
         files: [{
           attachment: suggestionAttachment.url,
-          name: suggestionAttachment.name
         }]
       });
 
