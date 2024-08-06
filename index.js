@@ -125,8 +125,30 @@ client.on('messageCreate', async message => {
   }
 });
 
+// Listen for specific emoji messages in the tennis channel
+client.on('messageCreate', async message => {
+  const tennisChannelId = '1270402719806521417'; // ID of the tennis channel
+  const emojiId1 = '1270402268877033543'; // ID of the first emoji <:SableWardKWACK>
+  const emojiId2 = '1270402244487151777'; // ID of the second emoji <:SableWardWACK>
 
+  if (message.channel.id === tennisChannelId && !message.author.bot) {
+    // Check if the message contains the first emoji
+    if (message.content.includes(`<:SableWardKWACK:${emojiId1}>`)) {
+      await message.channel.send(`<:SableWardWACK:${emojiId2}>`);
+    } 
+    // Check if the message contains the second emoji
+    else if (message.content.includes(`<:SableWardWACK:${emojiId2}>`)) {
+      await message.channel.send(`<:SableWardKWACK:${emojiId1}>`);
+    }
 
+    else {
+      const reply = await message.reply("Pleas send emoji to play.");
+      setTimeout(() => reply.delete(), 3000);
+      await message.delete();
+    }
+    
+  }
+});
 
 
 // Listen for slash commands and respond
