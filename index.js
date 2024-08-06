@@ -11,6 +11,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  
   // Register slash commands
   const commands = [
     new SlashCommandBuilder()
@@ -108,7 +109,7 @@ client.on('messageCreate', async message => {
       const suggestionMessage = await message.channel.send({
         content: `${suggestionAuthor}:`,
         files: [{
-          attachment: suggestionAttachment.url,
+          attachment: suggestionAttachment.attachment // Use the attachment data directly
         }]
       });
 
