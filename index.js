@@ -35,7 +35,15 @@ client.once('ready', () => {
     
     new SlashCommandBuilder()
       .setName('line')
-      .setDescription('Sends a random Sable voice line')
+      .setDescription('Sends a random Sable voice line'),
+    
+    new SlashCommandBuilder()
+      .setName('clear')
+      .setDescription('Clears a specified number of recent messages in the channel')
+      .addIntegerOption(option => 
+        option.setName('range')
+          .setDescription('The number of messages to delete (max 100)')
+          .setRequired(true))
 
   ];
 
@@ -81,6 +89,44 @@ client.on('messageCreate', async message => {
     await suggestionMessage.react('🔻');
   }
 });
+
+// Handle emote suggestions channel messages
+client.on('messageCreate', async message => {
+  const suggestionChannelId = '1270369264171225088'; // ID of the suggestion channel
+  
+  // Check if the message is in the suggestion channel and is not sent by a bot
+  if (message.channel.id === suggestionChannelId && !message.author.bot) {
+    const suggestionAuthor = message.author;
+
+    // Check if the message has attachments
+    if (message.attachments.size > 0) {
+      // Get the first attachment
+      const suggestionAttachment = message.attachments.first();
+      await message.delete(); // Delete the original message
+
+      // Re-send the attachment with content
+      const suggestionMessage = await message.channel.send({
+        content: `${suggestionAuthor}:`,
+        files: [{
+          attachment: suggestionAttachment.url,
+          name: suggestionAttachment.name
+        }]
+      });
+
+      // React to the message with the specified emojis
+      await suggestionMessage.react('🔺');
+      await suggestionMessage.react('🔻');
+    } else {
+      // If no attachments, you could optionally send a reply or handle it differently
+      const reply = await message.reply("Please attach an image for your emote suggestion.");
+      setTimeout(() => reply.delete(), 5000); // Delete the reply after 5 seconds
+      await message.delete();
+    }
+  }
+});
+
+
+
 
 
 // Listen for slash commands and respond
@@ -200,6 +246,29 @@ client.on('interactionCreate', async interaction => {
     const randomLine = lines[Math.floor(Math.random() * lines.length)];
     await interaction.reply({ content: `${randomLine}`, ephemeral: false});
   }
+
+    // Clear command
+    if (commandName === 'clear') {
+      const range = options.getInteger('range');
+  
+      if (!interaction.member.permissions.has('MANAGE_MESSAGES')) {
+        await interaction.reply({ content: 'You do not have permission to clear messages.', ephemeral: true });
+        return;
+      }
+  
+      if (range < 1 || range > 100) {
+        await interaction.reply({ content: 'Please specify a number between 1 and 100.', ephemeral: true });
+        return;
+      }
+  
+      try {
+        await interaction.channel.bulkDelete(range, true);
+        await interaction.reply({ content: `Successfully deleted ${range} messages.`, ephemeral: true });
+      } catch (error) {
+        console.error('Error deleting messages:', error);
+        await interaction.reply({ content: 'An error occurred while trying to delete messages.', ephemeral: true });
+      }
+    }
 });
 
 // Log in to Discord with your app's token from the environment variables
