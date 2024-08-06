@@ -63,6 +63,25 @@ client.on('guildMemberAdd', async member => {
   }
 });
 
+// Handle suggestions channel messages
+client.on('messageCreate', async message => {
+  const suggestionChannelId = '1270153824643846164'; // ID of the suggestion channel
+  
+  // Check if the message is in the suggestion channel and is not sent by a bot
+  if (message.channel.id === suggestionChannelId && !message.author.bot) {
+    const suggestionAuthor = message.author;
+    const suggestionContent = message.content;
+    await message.delete(); // Delete the original message
+
+    // Send the suggestion content as a code block (quote)
+    const suggestionMessage = await message.channel.send(`${suggestionAuthor}:` + `\`\`\` ${suggestionContent}\`\`\``);
+
+    // React to the message with the specified emojis
+    await suggestionMessage.react('🔺');
+    await suggestionMessage.react('🔻');
+  }
+});
+
 
 // Listen for slash commands and respond
 client.on('interactionCreate', async interaction => {
